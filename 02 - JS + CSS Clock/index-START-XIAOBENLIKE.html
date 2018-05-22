@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS + CSS Clock</title>
+</head>
+<body>
+
+
+    <div class="clock">
+      <div class="clock-face">
+        <div class="hand hour-hand trans"></div>
+        <div class="hand min-hand trans"></div>
+        <div class="hand second-hand trans"></div>
+      </div>
+    </div>
+
+
+  <style>
+    html {
+      /*background:#018DED url(http://unsplash.it/1500/1000?image=881&blur=50);*/
+      background-size:cover;
+      font-family:'helvetica neue';
+      text-align: center;
+      font-size: 10px;
+    }
+
+    body {
+      font-size: 2rem;
+      display:flex;
+      flex:1;
+      min-height: 100vh;
+      align-items: center;
+    }
+
+    .clock {
+      width: 30rem;
+      height: 30rem;
+      border:20px solid white;
+      border-radius:50%;
+      margin:50px auto;
+      position: relative;
+      padding:2rem;
+      box-shadow:
+        0 0 0 4px rgba(0,0,0,0.1),
+        inset 0 0 0 3px #EFEFEF,
+        inset 0 0 10px black,
+        0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .clock-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform: translateY(-3px); /* account for the height of the clock hands */
+    }
+    .clock-face:after{
+        width: 1em;
+        height: 1em;
+        left: 50%;
+        top: 50%;
+        position: absolute;
+        display: block;
+        content: '';
+        background-color: #a8c5d1;
+        border-radius: 50%;
+        box-shadow:
+                0 0 0 2px rgba(0,0,0,0.1),
+                0 0 10px rgba(0,0,0,0.2);
+        transform: translate(-50%, -50%);
+        /*transition: all .05s;*/
+
+    }
+    .hand {
+        width:50%;
+        height:6px;
+        background:black;
+        position: absolute;
+        top:50%;
+        right: 50%;
+        transform-origin: 100% 50%;
+        transform: rotate(90deg);
+    }
+    .hour-hand.trans{
+        transition: all .9s;
+    }
+    .hour-hand{
+        width: 30%;
+        height: 15px;
+    }
+    .min-hand.trans{
+        transition: all .5s;
+    }
+    .min-hand{
+        width: 40%;
+        height: 10px;
+    }
+    .second-hand.trans{
+        transition: all .3s;
+    }
+    .second-hand{
+        width: 45%;
+        height: 5px;
+        background: red;
+    }
+  </style>
+
+  <script>
+    /*
+    主要是调整transform:rotate(xxdeg);
+    */
+    const CLOCK = function(){
+        const Dom = (function(){
+            // 改变转动的角度
+            return {
+                rotate: function(ele, deg){
+                    ele.style.transform = `rotate(${deg}deg)`;
+                }
+            };
+        })();
+        const Tools = (function(){
+            return {
+                // 将时间转换为度数
+                transTimeToDeg: function(date, type){
+                    let time, deg;
+                    switch(type){
+                        case "hour":
+                            time = date.getHours();
+                            deg = ~~(time%12/12*360);
+                            break;
+                        case "min":
+                            time = date.getMinutes();
+                            deg = ~~(time/60*360);
+                            break;
+                        case "second":
+                            time = date.getSeconds();
+                            deg = ~~(time/60*360);
+                            break;
+                    }
+                    return deg;
+                },
+                /* 
+                计算时间
+                @param difference 毫秒值
+                @param source 时间的字符串
+                @return 计算后的日期
+                */
+                addTime: function(difference, source){
+                    const date = source ? new Date(source) : new Date();
+                    let time = date.getTime();
+                    if(difference){
+                        time += difference;
+                        date.setTime(time);
+                    }
+                    return date;
+                },
+                /* 
+                计算两个时间的差值
+                @param date1,date2 为日期类型
+                */
+                calcTime: function(date1, date2){
+                    return date1.getTime() - date2.getTime();
+                }
+            };
+        })();
+        const Item = (function(){
+            const _ele = {
+                hour: document.querySelector(".hour-hand"),
+                min: document.querySelector(".min-hand"),
+                second: document.querySelector(".second-hand"),
+            };
+            let _difference, _timeFlag;
+            return {
+                // 停止
+                stop: function(){
+                    clearInterval(_timeFlag);
+                },
+                // 开始
+                start: function(){
+                    _timeFlag = setInterval(Item.changeDeg, 1000);
+                },
+                // 设置时间
+                setTime: function(timeStr){
+                    const now = new Date(),
+                          dateStr = now.toLocaleDateString(),
+                          _time = new Date(dateStr + " " + timeStr);
+                    _difference = Tools.calcTime(_time, now);
+                },
+                changeDeg: function(){
+                    const now = Tools.addTime(_difference); 
+                    let name, deg, ele;
+                    for(name in _ele ){
+                        deg = 90 + Tools.transTimeToDeg(now, name);
+                        ele = _ele[name];
+                        if(deg == 90){
+                            ele.classList.remove("trans");
+                        }else{
+                            ele.classList.add("trans");
+                        }
+                        Dom.rotate(ele, deg);
+                    }
+                }
+            };
+        })();
+        
+        // 设置时间
+        this.setTime = Item.setTime;
+        // 开始转动
+        this.start = Item.start;
+        //停止转动
+        this.stop = Item.stop;
+        
+    }
+    let c = new CLOCK();
+    c.start();
+  </script>
+</body>
+</html>
