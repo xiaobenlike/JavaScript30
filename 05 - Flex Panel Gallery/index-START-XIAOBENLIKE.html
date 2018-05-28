@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flex Panels 💪</title>
+  <link href='https://fonts.googleapis.com/css?family=Amatic+SC' rel='stylesheet' type='text/css'>
+</head>
+<body>
+  <style>
+    html {
+        box-sizing: border-box;
+        background:#ffc600;
+        font-family:'helvetica neue';
+        font-size: 20px;
+        font-weight: 200;
+    }
+    body {
+        margin: 0;
+    }
+    *, *:before, *:after {
+        box-sizing: inherit;
+    }
+
+    .panels {
+        display: flex;
+        min-height:100vh;
+        overflow: hidden;
+    }
+
+    .panel {
+        background:#6B0F9C;
+        box-shadow:inset 0 0 0 5px rgba(255,255,255,0.1);
+        color:white;
+        text-align: center;
+        align-items:center;
+        /* Safari transitionend event.propertyName === flex */
+        /* Chrome + FF transitionend event.propertyName === flex-grow */
+        transition:
+        font-size 0.7s cubic-bezier(0.61,-0.19, 0.7,-0.11),
+        flex 0.7s cubic-bezier(0.61,-0.19, 0.7,-0.11),
+        background 0.2s;
+        font-size: 20px;
+        background-size:cover;
+        background-position:center;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    .panel1 { background: red; }
+    .panel2 { background: yellow;}
+    .panel3 { background: green;}
+    .panel4 { background:blue;}
+    .panel5 { background:pink;}
+
+    .panel > * {
+        margin:0;
+        width: 100%;
+        transition:transform 0.5s;
+    }
+
+    .panel p {
+        text-transform: uppercase;
+        font-family: 'Amatic SC', cursive;
+        text-shadow:0 0 4px rgba(0, 0, 0, 0.72), 0 0 14px rgba(0, 0, 0, 0.45);
+    }
+    .panel p.main {
+        font-size: 4em;
+        flex-grow: 5;
+    }
+    .panel p.detail{
+        font-size: 2em;
+        flex-grow: 1;
+    }
+    .panel p.first{
+        transform: translateY(-100%);
+    }
+    .panel p.last{
+        transform: translateY(100%);
+    }
+    .panel.open {
+        font-size:40px;
+    }
+    .panel.open .detail{
+        transform: translateY(0);
+    }
+
+    .cta {
+        color:white;
+        text-decoration: none;
+    }
+
+  </style>
+
+
+    <div class="panels">
+        <div class="panel panel1">
+            <p class="detail first">Hey</p>
+            <p class="main">Let's</p>
+            <p class="detail last">Dance</p>
+        </div>
+        <div class="panel panel2">
+            <p class="detail first">Give</p>
+            <p class="main">Take</p>
+            <p class="detail last">Receive</p>
+        </div>
+        <div class="panel panel3">
+            <p class="detail first">Experience</p>
+            <p class="main">It</p>
+            <p class="detai last">Today</p>
+        </div>
+        <div class="panel panel4">
+            <p class="detail first">Give</p>
+            <p class="main">All</p>
+            <p class="detail last">You can</p>
+        </div>
+        <div class="panel panel5">
+            <p class="detail first">Life</p>
+            <p class="main">In</p>
+            <p class="detail last">Motion</p>
+        </div>
+    </div>
+
+    <script>
+        const panels = document.querySelectorAll(".panel");
+        const toggleOpen = function(){
+            // console.log(this);
+            this.classList.toggle("open");
+        }
+        panels.forEach((item) => item.addEventListener("click", toggleOpen,false));
+    </script>
+
+
+
+
+
+
+</body>
+</html>
