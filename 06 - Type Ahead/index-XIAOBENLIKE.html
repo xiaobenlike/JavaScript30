@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Type Ahead 👀</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+
+        <form class="search-form">
+            <input type="text" class="search" placeholder="City or State" id="js-keyword">
+            <ul class="suggestions" id="js-resultList">
+                <li>Filter for a city</li>
+                <li>or a state</li>
+            </ul>
+        </form>
+        <script>
+        const Tool = {
+            formatTpl: (obj, tpl)=>{
+                for(name in obj){
+                    regx = new RegExp(`{${name}}`, "gi");
+                    tpl = tpl.replace(regx, obj[name]);
+                }
+                return tpl;
+            }
+        };
+        const Search = (()=>{
+            let Data = [];
+            const SOURCE = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+            const Dom = {
+                //结果处理
+                buildResultList: (data)=>{
+                    const tplArr = [
+                        '<li>',
+                            '<span class="name">{city},{state}</span>',
+                            '<span class="population">{latitude},{longitude}</span>',
+                        '</li>'
+                    ];
+                    const tpl = tplArr.join("");
+                    const result = data.map(item => Tool.formatTpl(item, tpl));  
+                    resultList.innerHTML = result.join("");
+                }
+            };
+            const Item = {
+                //获取资源
+                getSource: function(){
+                    fetch(SOURCE)
+                        .then(res => res.json())
+                        .then(data => Item.buildData(data));
+                },
+                //获得查询数据
+                buildData: (data)=>{
+                    const trans = data.map(item => {
+                        var latitude = ~~ item.latitude,
+                            longitude = ~~ item.longitude;
+                        return {
+                            city: item.city,
+                            latitude: latitude,
+                            longitude: longitude,
+                            state: item.state
+                        };
+                    });
+                    Data.push(...trans);
+                },
+                //搜索数据
+                doSearch: (keyword)=>{
+                    const regx = new RegExp(keyword,"gi");
+                    return Data.filter((item) => item.city.match(regx) || item.state.match(regx));
+                },
+            };
+            return {
+                init:()=>{
+                    Item.getSource();
+                },
+                doSearch:function(){
+                    const keyword = this.value,
+                          data = Item.doSearch(keyword);
+                    Dom.buildResultList(data);
+                }
+            };
+        })();
+
+        const keyword = document.getElementById("js-keyword"),
+              resultList = document.getElementById("js-resultList");
+        Search.init();
+        keyword.addEventListener('change', Search.doSearch);
+        keyword.addEventListener("keyup", Search.doSearch);
+        </script>
+    </body>
+</html>
