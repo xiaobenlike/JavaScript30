@@ -42,20 +42,29 @@
 							}
 							const _self = Item;
 							const point = _self.getPosition(event);
+							console.log(point);
 							
 							_self.setStroke(_self.calcHue());
 							_self.setLineWidth(_self.calcLineWidth());
-							if(event.type == "mousedown" || event.type == "touchstart"){
-								canvas.beginPath();
-								canvas.moveTo(point[0], point[1]);
-							}
-							canvas.lineTo(point[0], point[1]);
+
+							// _self.snow(point);
+							_self.line(point);
+							
 							canvas.stroke();
+						},
+						// 雪花
+						snow: (point) => {
+							canvas.lineTo(point[0], point[1]);
+							canvas.moveTo(point[0], point[1]);
+						},
+						// 平滑的线
+						line: (point) => {
+							canvas.lineTo(point[0], point[1]);
 						},
 						// 获得当前移动的位置
 						getPosition: (event) => {
 							const point = [];
-							if(event.type == "mousemove"){
+							if(event.type == "mousemove" || event.type == "mousedown"){
 								// x
 								point[0] = event.offsetX;
 								// y
@@ -96,8 +105,14 @@
 						},
 						// 改变可绘画的状态
 						changeEditable: (editable) => {
-							console.log(editable);
 							_setting.editable = editable;
+						},
+						start: (event) => {
+							const _self = Item;
+							const point = _self.getPosition(event);
+							canvas.beginPath();
+							canvas.moveTo(point[0], point[1]);
+							_self.changeEditable(true);
 						}
 					}
 				})();
@@ -110,13 +125,14 @@
 					},
 					// 改变可绘画的状态
 					changeEditable: Item.changeEditable,
+					start: Item.start
 				};
 			})();
 			const canvasEle = document.getElementById("js-canvas");
 			RainbowDraw.init(canvasEle);
 
 			// 鼠标
-			canvasEle.addEventListener("mousedown", () => RainbowDraw.changeEditable(true));
+			canvasEle.addEventListener("mousedown", RainbowDraw.start);
 			canvasEle.addEventListener("mousemove", RainbowDraw.draw);
 			canvasEle.addEventListener("mouseup", () => RainbowDraw.changeEditable(false));
 			canvasEle.addEventListener("mouseout", () => RainbowDraw.changeEditable(false));
