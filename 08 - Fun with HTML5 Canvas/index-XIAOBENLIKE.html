@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>HTML5 Canvas</title>
+	<style>
+	html, body {
+		margin:0;
+	}
+	.canvas{
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+	}
+	</style>
+</head>
+<body>
+	<canvas class="canvas" id="js-canvas"></canvas>
+	<script>
+		// 实现彩虹画笔
+		(function(){
+			const RainbowDraw = (function(){
+				const Item = (function(){
+					let canvas;
+					const _setting = {
+						editable: false,
+						hue: 0,//0-360
+						lineWidth: 20,//0-20
+					};
+					return {
+						// 初始化
+						init: (canvasEle) => {
+							canvasEle.width = window.innerWidth;
+							canvasEle.height = window.innerHeight;
+							// 初始化画布
+							canvas = canvasEle.getContext("2d");
+						},
+						// 绘画-路径
+						draw:(event)=>{
+							if(!_setting.editable){
+								return;
+							}
+							const _self = Item;
+							const point = _self.getPosition(event);
+							
+							_self.setStroke(_self.calcHue());
+							_self.setLineWidth(_self.calcLineWidth());
+							if(event.type == "mousedown" || event.type == "touchstart"){
+								canvas.beginPath();
+								canvas.moveTo(point[0], point[1]);
+							}
+							canvas.lineTo(point[0], point[1]);
+							canvas.stroke();
+						},
+						// 获得当前移动的位置
+						getPosition: (event) => {
+							const point = [];
+							if(event.type == "mousemove"){
+								// x
+								point[0] = event.offsetX;
+								// y
+								point[1] = event.offsetY;
+							} else  {
+								// x
+								point[0] = event.changedTouches[0].clientX;
+								// y
+								point[1] = event.changedTouches[0].clientY;
+							}
+							return point;
+						},
+						// 设置笔触
+						setStroke: () => {
+							canvas.strokeStyle = `hsl(${_setting.hue}, 90%, 50%)`;
+						},
+						// 计算hue
+						calcHue: () => {
+							const current = _setting.hue;
+							if(current < 1){
+								_setting.hue = 360;
+							}else{
+								_setting.hue--;
+							}
+						},
+						// 设置线条宽度
+						setLineWidth: () => {
+							canvas.lineWidth = _setting.lineWidth;
+						},
+						// 计算width
+						calcLineWidth: () => {
+							const current = _setting.lineWidth;
+							if(current < 1){
+								_setting.lineWidth = 20;
+							}else{
+								_setting.lineWidth--;
+							}
+						},
+						// 改变可绘画的状态
+						changeEditable: (editable) => {
+							console.log(editable);
+							_setting.editable = editable;
+						}
+					}
+				})();
+				return {
+					// 画
+					draw: Item.draw,
+					// 初始化
+					init: (canvasEle) => {
+						Item.init(canvasEle);
+					},
+					// 改变可绘画的状态
+					changeEditable: Item.changeEditable,
+				};
+			})();
+			const canvasEle = document.getElementById("js-canvas");
+			RainbowDraw.init(canvasEle);
+
+			// 鼠标
+			canvasEle.addEventListener("mousedown", () => RainbowDraw.changeEditable(true));
+			canvasEle.addEventListener("mousemove", RainbowDraw.draw);
+			canvasEle.addEventListener("mouseup", () => RainbowDraw.changeEditable(false));
+			canvasEle.addEventListener("mouseout", () => RainbowDraw.changeEditable(false));
+			// 触摸屏
+			canvasEle.addEventListener("touchstart", () => RainbowDraw.changeEditable(true));
+			canvasEle.addEventListener("touchmove", RainbowDraw.draw);
+			canvasEle.addEventListener("touchend", () => RainbowDraw.changeEditable(false));
+			canvasEle.addEventListener("touchcancle", () => RainbowDraw.changeEditable(false));
+		})();
+	</script>
+</body>
+</html>
