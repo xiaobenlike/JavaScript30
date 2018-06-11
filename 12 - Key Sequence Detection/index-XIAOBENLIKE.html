@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  	<meta charset="UTF-8">
+  	<title>Key Detection</title>
+  	<script type="text/javascript" src="http://www.cornify.com/js/cornify.js"></script>
+</head>
+<body>
+	<script>
+	(function(){
+		const pressed = [],
+			  password = "xiaowangwang";
+
+		window.addEventListener( "keydown", (e)=>{
+			let key = e.key;
+			console.log("u preesed:" + key);
+			pressed.push(key);
+			/*
+			amazing!!!!
+			equals:
+			1、if(pressed.length > password.length){
+				pressed.splice(-(password.length + 1), 1);
+			}
+			
+
+			splice(startIndex, length), when length <= 0, it will be ignore
+
+
+			2、if(pressed.length > password.length){
+				pressed.splice(0, 1);
+			}
+			*/
+			// pressed.splice(-(password.length + 1), pressed.length - password.length);
+			if(pressed.length > password.length){
+				pressed.splice(0, 1);
+			}
+			console.log(pressed);
+			if(pressed.join('') == password){
+				console.log("login");
+			}
+		}, false);
+	})();
+	</script>
+</body>
+</html>
